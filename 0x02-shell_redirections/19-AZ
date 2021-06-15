@@ -1,2 +1,4 @@
 #!/bin/bash
-tr Ac Ze <
+<<<<<<< HEAD
+tr Ac Ze < "\n"
+>>>>>>> 567bb05d6b8b660811d5d5ff94f674ab778905b5
