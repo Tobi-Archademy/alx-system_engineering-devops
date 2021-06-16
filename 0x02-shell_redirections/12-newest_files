@@ -1,3 +1,2 @@
 #!/bin/bash
 ls -lt | head -10
->>>>>>> b5cbc99c2a3f011a019780981e65dadc7e152a75
