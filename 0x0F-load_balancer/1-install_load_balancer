@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# Install and configure HAproxy on my lb-01 server.
+sudo apt-get -y install --no-install-recommends software-properties-common
+sudo add-apt-repository -y ppa:vbernat/haproxy-2.5
+sudo apt-get -y update
+sudo apt-get -y install haproxy=2.5.\*
+
+# edit config file
+server_config=\
+"
+frontend sabot-dev
+        bind *:80
+        mode http
+        default_backend sabot-dev
+backend sabot-dev
+        balance roundrobin
+        server 786-web-01 34.139.214.81:80 check
+        server 786-web-02 35.196.47.120:80 check
+"
+sudo chmod 777 /etc/haproxy/haproxy.cfg
+echo "$server_config" >> /etc/haproxy/haproxy.cfg
+
+# enable haproxy to be started by init script
+
+sudo chmod 777 /etc/default/haproxy
+echo "ENABLED=1" >> /etc/default/haproxy
+
+sudo service haproxy restart
