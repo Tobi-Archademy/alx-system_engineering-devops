@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 # Configure Nginx so that its HTTP response contains a custom header
 # HTTP response contains a custom header (on web-01 and web-02)
-sudo apt-get update
+# Install nginx web server
+
+sudo apt-get -y update
 sudo apt-get -y install nginx
 sudo chmod 777 /var/www/html/index.nginx-debian.html
 echo "Hello World!" > /var/www/html/index.nginx-debian.html
