@@ -1,28 +1,28 @@
 #!/usr/bin/env bash
-# Configure Nginx so that its HTTP response contains a custom header
-# HTTP response contains a custom header (on web-01 and web-02)
-# Install nginx web server
-
+# shellcheck disable=SC2154
+# https://www.digitalocean.com/community/tutorials/how-to-configure-nginx-to-use-custom-error-pages-on-ubuntu-14-04
+# configure a new nginx web server
+# install the Nginx
 sudo apt-get -y update
 sudo apt-get -y install nginx
-sudo chmod 777 /var/www/html/index.nginx-debian.html
-echo "Hello World!" > /var/www/html/index.nginx-debian.html
-echo "Ceci n'est pas une page" > /var/www/html/404.html
-echo "server {
-    listen 80 default_server;
-    listen [::]:80 default_server;
-    root /var/www/html;
-    index index.html index.nginx-debian.html;
-    server_name sabot-dev.tech;
-    add_header X-Served-By $hostname;
-    rewrite ^/redirect_me/$ www.google.com/ permanent;
-    location / {
-	try_files $uri $uri/ =404;
-    }
-
-    if ($request_filename ~ redirect_me){
-	   rewrite ^ https://www.youtube.com/watch?v=QH2-TGUlwu4 permanent;
-    }
-}" > /etc/nginx/sites-enabled/default
-
+# enable pass of traffic in the port 80
+sudo ufw allow 'Nginx HTTP'
+# redirect
+var="server_name _;\n\trewrite ^\/redirect_me https:\/\/www.youtube.com\/watch?v=QH2-TGUlwu4 permanent;"
+cd /etc/nginx/sites-available/ || exit
+sudo sed -i "s/server_name _;/$var/" default
+cd - || exit
+# adding message to 404 not found
+echo -e "Ceci n'est pas une page\n" | sudo tee /var/www/html/404.html
+# adding a new line inside /etc/nginx/sites-available/default
+var404="server_name _;\n\terror_page 404 \/404.html;\n\tlocation = \/404.html {\n\t\troot \/var\/www\/html;\n\t\tinternal;\n\t}"
+cd /etc/nginx/sites-available/ || exit
+sudo sed -i "s/server_name _;/$var404/" default
+cd - || exit
+# adding a custom http header
+varHeader="http { add_header X-Served-By $HOSTNAME;"
+cd /etc/nginx/ || exit
+sudo sed -i "s/http {/$varHeader/" nginx.conf
+cd - || exit
+# restart Nginx service for get changes
 sudo service nginx restart
