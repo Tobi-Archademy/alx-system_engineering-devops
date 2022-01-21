@@ -39,11 +39,23 @@ frontend www-http
         default_backend web-backend
 
 frontend www-https
-        bind :443 ssl crt /etc/ssl/sabot-dev.tech.pem
+        bind *:443 ssl crt /etc/ssl/www.sabot-dev.tech.pem
         http-request add-header X-Forwarded-Proto https
         default_backend web-backend
 
 backend web-backend
         redirect scheme https if !{ ssl_fc }
+        server 786-web-01 34.139.214.81:80 check
+        server 786-web-02 35.196.47.120:80 check
+
+frontend localnodes
+        bind *:80
+        mode http
+        default_backend nodes
+
+backend nodes
+        mode http
+        balance roundrobin
+        option forwardfor
         server 786-web-01 34.139.214.81:80 check
         server 786-web-02 35.196.47.120:80 check
