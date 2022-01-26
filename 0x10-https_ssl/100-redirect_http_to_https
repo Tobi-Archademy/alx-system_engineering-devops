@@ -51,6 +51,8 @@ backend web-backend
 frontend localnodes
         bind *:80
         mode http
+	# Redirect HTTP to  HTTPS
+	redirect scheme https code 301 if !{ ssl_fc }
         default_backend nodes
 
 backend nodes
